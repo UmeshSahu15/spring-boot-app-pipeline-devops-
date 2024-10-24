@@ -2,14 +2,14 @@
 pipeline {
   agent { label 'build' }
    environment { 
-        registry = "adamtravis/democicd" 
+        registry = "kiransanda/democicd" 
         registryCredential = 'dockerhub' 
    }
 
   stages {
     stage('Checkout') {
       steps {
-        git branch: 'main', credentialsId: 'GitlabCred', url: 'https://gitlab.com/learndevopseasy/devsecops/springboot-build-pipeline.git'
+        git branch: 'main', credentialsId: 'GitlabCred', url: 'https://gitlab.com/learndevopseasypractice/devsecops/springboot-build-pipeline.git'
       }
     }
   
