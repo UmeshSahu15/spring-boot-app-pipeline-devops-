@@ -95,7 +95,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
 
-      <!-- ✅ Updated OWASP Dependency Check -->
+      <!-- ✅ Updated OWASP Dependency Check (no NVD key) -->
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
@@ -108,18 +108,15 @@
           </execution>
         </executions>
         <configuration>
-          <!-- Report formats -->
           <formats>
             <format>json</format>
             <format>html</format>
           </formats>
-          <!-- ✅ Use NVD API key from Jenkins environment -->
-          <nvdApiKeyEnvironmentVariable>NVD_API_KEY</nvdApiKeyEnvironmentVariable>
-          <!-- ✅ Cache directory (so Jenkins can reuse) -->
           <dataDirectory>/var/lib/jenkins/odc-data</dataDirectory>
-          <!-- ✅ Avoid hitting API rate limits -->
-          <nvdApiDelay>6000</nvdApiDelay>
-          <nvdMaxRetryCount>3</nvdMaxRetryCount>
+          <autoUpdate>true</autoUpdate>
+          <updateOnly>false</updateOnly>
+          <connectionTimeout>60000</connectionTimeout>
+          <retireJsEnabled>false</retireJsEnabled>
         </configuration>
       </plugin>
 
