@@ -95,31 +95,6 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
 
-      <!-- ✅ Updated OWASP Dependency Check (no NVD key) -->
-      <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>12.1.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <formats>
-            <format>json</format>
-            <format>html</format>
-          </formats>
-          <dataDirectory>/var/lib/jenkins/odc-data</dataDirectory>
-          <autoUpdate>true</autoUpdate>
-          <updateOnly>false</updateOnly>
-          <connectionTimeout>60000</connectionTimeout>
-          <retireJsEnabled>false</retireJsEnabled>
-        </configuration>
-      </plugin>
-
       <!-- JaCoCo -->
       <plugin>
         <groupId>org.jacoco</groupId>
