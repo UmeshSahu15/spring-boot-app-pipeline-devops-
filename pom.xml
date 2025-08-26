@@ -15,7 +15,7 @@
         <name>ADAM M</name>
     </organization>
 
-    <!-- ✅ Latest Spring Boot parent -->
+    <!-- ✅ Spring Boot parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -28,8 +28,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <!-- Dependency Versions -->
-        <com.google.guava.guava.version>33.2.1-jre</com.google.guava.guava.version>
+        <!-- Versions -->
+        <guava.version>33.2.1-jre</guava.version>
         <owasp.dependency.check.version>12.1.0</owasp.dependency.check.version>
         <jacoco.version>0.8.12</jacoco.version>
     </properties>
@@ -59,7 +59,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- ✅ H2 Database (runtime for tests/dev) -->
+        <!-- ✅ H2 Database (runtime for dev/test) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -70,10 +70,10 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${com.google.guava.guava.version}</version>
+            <version>${guava.version}</version>
         </dependency>
 
-        <!-- ✅ OpenAPI (Swagger replacement) -->
+        <!-- ✅ OpenAPI Docs -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -104,25 +104,26 @@
                 <version>${owasp.dependency.check.version}</version>
                 <executions>
                     <execution>
+                        <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- Output reports in multiple formats -->
+                    <!-- Generate multiple report formats -->
                     <formats>
                         <format>HTML</format>
                         <format>JSON</format>
                     </formats>
-                    <!-- Don’t fail build on vulnerability, just report -->
+                    <!-- Don’t fail pipeline on vulnerability -->
                     <failOnError>false</failOnError>
-                    <!-- Injected via Jenkins environment -->
+                    <!-- NVD API Key from Jenkins environment -->
                     <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
                 </configuration>
             </plugin>
 
-            <!-- ✅ JaCoCo for Code Coverage -->
+            <!-- ✅ JaCoCo Code Coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
