@@ -89,9 +89,9 @@ pipeline {
       steps { 
         echo "Scanning Docker Image with Trivy..."
         sh '''
+          # Use extended regex (-E) to avoid Groovy escape issues
           trivy image --scanners vuln --offline-scan ${registry}:${BUILD_NUMBER} > trivy-image-report.txt
-          # Fail pipeline if vulnerabilities found
-          if grep -q "CRITICAL\|HIGH" trivy-image-report.txt; then
+          if grep -E "CRITICAL|HIGH" trivy-image-report.txt; then
             echo "High or Critical vulnerabilities found! Failing pipeline..."
             exit 1
           fi
