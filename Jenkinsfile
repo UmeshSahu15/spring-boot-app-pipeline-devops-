@@ -128,7 +128,7 @@ pipeline {
           ./check.sh
 
           # Clean up
-          docker rm -f smokerun
+         # docker rm -f smokerun
         '''
       }
     }
