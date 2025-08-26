@@ -39,7 +39,7 @@ pipeline {
         withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
           sh '''
             export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-            mvn org.owasp:dependency-check-maven:check -Dnvd.api.key=$NVD_API_KEY
+            mvn org.owasp:dependency-check-maven:check -DnvdApiKey=$NVD_API_KEY
           '''
         }
       }
@@ -79,8 +79,9 @@ pipeline {
         echo "Building Docker Image..."
         script {
           docker.withRegistry('', registryCredential) { 
-            def myImage = docker.build(registry)
+            def myImage = docker.build("${registry}:${BUILD_NUMBER}")
             myImage.push()
+            myImage.push("latest")
           }
         }
       }
@@ -89,7 +90,7 @@ pipeline {
     stage('Stage VII: Scan Image') {
       steps { 
         echo "Scanning Docker Image with Trivy..."
-        sh "trivy image --scanners vuln --offline-scan ${registry}:latest > trivyresults.txt"
+        sh "trivy image --scanners vuln --offline-scan ${registry}:${BUILD_NUMBER} > trivyresults.txt"
       }
     }
           
@@ -97,7 +98,7 @@ pipeline {
       steps { 
         echo "Running Smoke Test on Docker Image..."
         sh '''
-          docker run -d --name smokerun -p 8080:8080 ${registry}:latest
+          docker run -d --name smokerun -p 8080:8080 ${registry}:${BUILD_NUMBER}
           sleep 90
           ./check.sh
           docker rm --force smokerun
