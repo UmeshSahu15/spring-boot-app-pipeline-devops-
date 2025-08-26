@@ -49,17 +49,18 @@ pipeline {
     }
 
     stage('Stage IV: SAST') {
-      steps { 
-        echo "Running Static Application Security Testing using SonarQube Scanner ..."
-        withSonarQubeEnv('mysonarqube') {
-          sh '''
-            mvn sonar:sonar \
-              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-              -Dsonar.projectName=wezvatech
-          '''
-        }
-      }
+  steps { 
+    echo "Running Static Application Security Testing using SonarQube Scanner ..."
+    withSonarQubeEnv('sonarqube') {   // 👈 use the exact name configured in Jenkins
+      sh '''
+        mvn sonar:sonar \
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+          -Dsonar.projectName=wezvatech
+      '''
     }
+  }
+}
+
 
     stage('Stage V: Quality Gates') {
       steps { 
