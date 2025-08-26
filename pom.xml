@@ -7,113 +7,102 @@
 
     <groupId>com.myapp</groupId>
     <artifactId>wezvatech-demo</artifactId>
-    <version>9739110917</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Spring boot application example</name>
+    <name>Spring Boot Application Example</name>
     <description>Demo wezvatech Ninjas project</description>
 
     <organization>
         <name>ADAM M</name>
     </organization>
 
+    <!-- ✅ Latest Spring Boot parent (3.3.3 as of Aug 2025) -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.3.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.3.3</version>
+        <relativePath/>
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <!-- dependency versions -->
-        <com.google.guava.guava.version>21.0</com.google.guava.guava.version>
-        <io.springfox.springfox-swagger2>2.3.1</io.springfox.springfox-swagger2>
-        <io.springfox.springfox-swagger-ui>2.3.1</io.springfox.springfox-swagger-ui>
+        <java.version>17</java.version> <!-- ✅ Spring Boot 3 requires Java 17+ -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <!-- Dependency Versions -->
+        <com.google.guava.guava.version>33.2.1-jre</com.google.guava.guava.version>
+        <owasp.dependency.check.version>12.1.0</owasp.dependency.check.version>
+        <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
     <dependencies>
-        <!-- For default Spring Boot utilities -->
+        <!-- ✅ Core Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- For testing possibility -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- For all mvc and web functions -->
+        <!-- ✅ Web & REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Default persistence functions -->
+        <!-- ✅ Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- ✅ Security -->
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-java8</artifactId>
-            <version>5.0.5.Final</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- In-Memory DB -->
+        <!-- ✅ H2 Database for Testing -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Java Utilities from google -->
+        <!-- ✅ Google Guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${com.google.guava.guava.version}</version>
         </dependency>
 
-        <!-- Include swagger for API description -->
+        <!-- ✅ OpenAPI (replacement for old springfox-swagger) -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${io.springfox.springfox-swagger2}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.7.0</version>
         </dependency>
 
-        <!-- Include swagger for API description UI -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${io.springfox.springfox-swagger-ui}</version>
-        </dependency>
-
+        <!-- ✅ Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>1.2.0.RELEASE</version>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Spring Boot Plugin -->
+            <!-- ✅ Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- ✅ Updated OWASP Dependency-Check Plugin -->
+            <!-- ✅ OWASP Dependency-Check Plugin -->
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>12.1.0</version>
+                <version>${owasp.dependency.check.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -122,27 +111,20 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- Report formats -->
                     <formats>
                         <format>HTML</format>
                         <format>JSON</format>
                     </formats>
-                    <!-- Don’t fail build if NVD feed is unreachable -->
                     <failOnError>false</failOnError>
-                    <!-- Optional: add your NVD API Key via Jenkins env variable -->
                     <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
                 </configuration>
             </plugin>
 
-            <!-- Code Coverage -->
+            <!-- ✅ JaCoCo for Test Coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.6.201602180812</version>
-                <configuration>
-                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-                    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
-                </configuration>
+                <version>${jacoco.version}</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -150,9 +132,15 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 
