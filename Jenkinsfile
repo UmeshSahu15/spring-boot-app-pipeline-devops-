@@ -1,4 +1,3 @@
-
 pipeline {
   agent { label 'build' }
    environment { 
@@ -22,7 +21,7 @@ pipeline {
 
    stage('Stage II: Code Coverage ') {
       steps {
-	    echo "Running Code Coverage ..."
+        echo "Running Code Coverage ..."
         sh "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; mvn jacoco:report"
       }
     }
@@ -30,7 +29,12 @@ pipeline {
    stage('Stage III: SCA') {
       steps { 
         echo "Running Software Composition Analysis using OWASP Dependency-Check ..."
-        sh "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; mvn org.owasp:dependency-check-maven:check"
+        withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
+          sh """
+            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+            mvn org.owasp:dependency-check-maven:check -Dnvd.api.key=$NVD_API_KEY
+          """
+        }
       }
     }
 
