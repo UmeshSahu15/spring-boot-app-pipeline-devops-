@@ -33,18 +33,20 @@ pipeline {
       }
     }
 
-   stage('Stage III: SCA') {
-  steps {
-    echo "Running Software Composition Analysis using OWASP Dependency-Check ..."
-    withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
-      sh '''
-        export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-        mvn org.owasp:dependency-check-maven:check -Dnvd.api.key=$NVD_API_KEY
-      '''
+    stage('Stage III: SCA') {
+      steps {
+        echo "Running Software Composition Analysis using Trivy ..."
+        sh '''
+          # Scan source code dependencies for vulnerabilities
+          trivy fs --scanners vuln . > trivy-sca-report.txt
+        '''
+      }
+      post {
+        always {
+          archiveArtifacts artifacts: 'trivy-sca-report.txt', fingerprint: true
+        }
+      }
     }
-  }
-}
-
 
     stage('Stage IV: SAST') {
       steps { 
@@ -53,8 +55,6 @@ pipeline {
           sh '''
             mvn sonar:sonar \
               -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-              -Dsonar.dependencyCheck.jsonReportPath=target/dependency-check-report.json \
-              -Dsonar.dependencyCheck.htmlReportPath=target/dependency-check-report.html \
               -Dsonar.projectName=wezvatech
           '''
         }
@@ -91,7 +91,12 @@ pipeline {
     stage('Stage VII: Scan Image') {
       steps { 
         echo "Scanning Docker Image with Trivy..."
-        sh "trivy image --scanners vuln --offline-scan ${registry}:${BUILD_NUMBER} > trivyresults.txt"
+        sh "trivy image --scanners vuln --offline-scan ${registry}:${BUILD_NUMBER} > trivy-image-report.txt"
+      }
+      post {
+        always {
+          archiveArtifacts artifacts: 'trivy-image-report.txt', fingerprint: true
+        }
       }
     }
           
