@@ -33,17 +33,18 @@ pipeline {
       }
     }
 
-    stage('Stage III: SCA') {
-      steps { 
-        echo "Running Software Composition Analysis using OWASP Dependency-Check ..."
-        withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
-          sh '''
-            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-            mvn org.owasp:dependency-check-maven:check -DnvdApiKey=$NVD_API_KEY
-          '''
-        }
-      }
+   stage('Stage III: SCA') {
+  steps {
+    echo "Running Software Composition Analysis using OWASP Dependency-Check ..."
+    withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
+      sh '''
+        export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+        mvn org.owasp:dependency-check-maven:check -Dnvd.api.key=$NVD_API_KEY
+      '''
     }
+  }
+}
+
 
     stage('Stage IV: SAST') {
       steps { 
