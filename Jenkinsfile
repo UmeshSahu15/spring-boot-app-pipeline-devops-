@@ -2,8 +2,8 @@ pipeline {
   agent { label 'build' }
 
   environment { 
-    registry = "kiransanda/democicd"
-    registryCredential = 'dockerhub'
+    registry = "6378257556/wezvatech-demo"  // Docker Hub username + image
+    registryCredential = 'DOCKER'          // Jenkins credential ID
   }
 
   stages {
@@ -36,10 +36,7 @@ pipeline {
     stage('Stage III: SCA') {
       steps {
         echo "Running Software Composition Analysis using Trivy ..."
-        sh '''
-          # Scan source code dependencies for vulnerabilities
-          trivy fs --scanners vuln . > trivy-sca-report.txt
-        '''
+        sh 'trivy fs --scanners vuln . > trivy-sca-report.txt'
       }
       post {
         always {
@@ -49,18 +46,17 @@ pipeline {
     }
 
     stage('Stage IV: SAST') {
-  steps { 
-    echo "Running Static Application Security Testing using SonarQube Scanner ..."
-    withSonarQubeEnv('sonarqube') {   // 👈 use the exact name configured in Jenkins
-      sh '''
-        mvn sonar:sonar \
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-          -Dsonar.projectName=wezvatech
-      '''
+      steps { 
+        echo "Running Static Application Security Testing using SonarQube Scanner ..."
+        withSonarQubeEnv('sonarqube') {
+          sh '''
+            mvn sonar:sonar \
+              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+              -Dsonar.projectName=wezvatech
+          '''
+        }
+      }
     }
-  }
-}
-
 
     stage('Stage V: Quality Gates') {
       steps { 
@@ -76,11 +72,11 @@ pipeline {
       }
     }
    
-    stage('Stage VI: Build Image') {
+    stage('Stage VI: Build & Push Docker Image') {
       steps { 
         echo "Building Docker Image..."
         script {
-          docker.withRegistry('', registryCredential) { 
+          docker.withRegistry('https://index.docker.io/v1/', registryCredential) { 
             def myImage = docker.build("${registry}:${BUILD_NUMBER}")
             myImage.push()
             myImage.push("latest")
@@ -89,10 +85,17 @@ pipeline {
       }
     }
         
-    stage('Stage VII: Scan Image') {
+    stage('Stage VII: Scan Docker Image') {
       steps { 
         echo "Scanning Docker Image with Trivy..."
-        sh "trivy image --scanners vuln --offline-scan ${registry}:${BUILD_NUMBER} > trivy-image-report.txt"
+        sh '''
+          trivy image --scanners vuln --offline-scan ${registry}:${BUILD_NUMBER} > trivy-image-report.txt
+          # Fail pipeline if vulnerabilities found
+          if grep -q "CRITICAL\|HIGH" trivy-image-report.txt; then
+            echo "High or Critical vulnerabilities found! Failing pipeline..."
+            exit 1
+          fi
+        '''
       }
       post {
         always {
