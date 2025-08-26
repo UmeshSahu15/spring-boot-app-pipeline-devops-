@@ -71,7 +71,7 @@ pipeline {
         }
       }
     }
-
+   
     stage('Stage VI: Build & Push Docker Image') {
       steps { 
         echo "Building Docker Image..."
@@ -111,15 +111,24 @@ pipeline {
         }
       }
     }
-
+          
     stage('Stage VIII: Smoke Test') {
       steps { 
         echo "Running Smoke Test on Docker Image..."
         sh '''
+          # Remove existing smokerun container if it exists
+          docker rm -f smokerun || true
+
+          # Make check.sh executable
+          chmod +x ./check.sh
+
+          # Run container
           docker run -d --name smokerun -p 8080:8080 ${registry}:${BUILD_NUMBER}
           sleep 90
           ./check.sh
-          docker rm --force smokerun
+
+          # Clean up
+          docker rm -f smokerun
         '''
       }
     }
